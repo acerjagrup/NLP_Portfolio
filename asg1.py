@@ -39,6 +39,8 @@ def main():
 
     file_lines.pop(0)  # Remove the first item (row 1--it is only labels, no data)
     person_dict = convert_to_person_dict(file_lines)
+    if not person_dict:  # No dict was made (because an ID was duplicated)
+        return
 
     # Demonstrate pickle
     pickle.dump(person_dict, open('persons.p', 'wb'))
@@ -69,7 +71,11 @@ def convert_to_person_dict(unprocessed_person_list):
         sanitized_person_string = person_string.strip()  # Remove \n and trailing whitespaces
         person_data = sanitized_person_string.split(",")
         new_person = create_person(person_data)
-        persons[new_person.get_id()] = new_person
+        new_person_id = new_person.get_id()
+        if new_person_id in persons.keys():
+            print(f"Error: ID {new_person_id} occurs more than once")
+            return None
+        persons[new_person_id] = new_person
 
     return persons
 
