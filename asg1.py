@@ -88,8 +88,8 @@ def create_person(person_data):
     first = str(person_data[1]).lower().capitalize()
     mi = str(person_data[2]).upper() if (person_data[2] != "") else "X"  # Use X if no initial is specified
     id = str(person_data[3]).upper()
-    if not re.search("^[A-Za-z]{2}[0-9]{4}$", id):
-        id = input(f"ID invalid: {id}\nID is two letters followed by four digits\nPlease enter a valid ID: ")
+    while not re.search("^[A-Za-z]{2}[0-9]{4}$", id):
+        id = input(f"ID invalid: {id}\nID is two letters followed by four digits\nPlease enter a valid ID: ").upper()
     phone = str(person_data[4])
 
     # Only lets those with consistent delimiter though: 555.555.5555 is fine but not 555.555-5555
@@ -99,7 +99,7 @@ def create_person(person_data):
     if re.search("^[0-9]{10}$", phone):
         phone = phone[:3] + "-" + phone[3:6] + "-" + phone[6:10]
 
-    if not re.search("^[0-9]{3}-[0-9]{3}-[0-9]{4}$", phone):  # If it's still not correct, reinput is necessary
+    while not re.search("^[0-9]{3}-[0-9]{3}-[0-9]{4}$", phone):  # If it's still not correct, reinput is necessary
         phone = input(f"Phone number invalid: {phone}\nPlease input a phone number of the format 555-555-5555: ")
 
     return Person(last, first, mi, id, phone)
