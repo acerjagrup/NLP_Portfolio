@@ -9,5 +9,5 @@ This project involves creating a Python script to read through a badly-wrangled 
 In this notebook I used NLTK to analyze its built-in text1, including lemmatization, stemming, and concordance.
 #### Guessing Game: [Code](Guessing_Game/guessinggame.py)
 This project involves using NLTK to parse a supplied text file to determine the 50 most common nouns. After that, those nouns are used as a list for a hangman or Wheel of Fortune-style game.  
-#### WordNet: [PDF](WordNet.pdf)
+#### WordNet: [PDF](WordNet/WordNet.pdf)
 In this notebook I explored some capabilities of WordNet including synonym sets, sentiment analysis, and collocations.
