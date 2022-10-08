@@ -1,7 +1,7 @@
 # Created by: Acer Jagrup ACJ190005 & Silvano Guadalupe Gallegos SGG180002
 #   Assignment: Web Crawler
 #   Class: CS 4395.001
-#   Date: October 2, 2022
+#   Date: October 7, 2022
 #
 
 from bs4 import BeautifulSoup
