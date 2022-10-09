@@ -14,22 +14,28 @@ from nltk.stem import WordNetLemmatizer
 
 def main():
     starter_url = "https://en.wikipedia.org/wiki/Lamborghini"
-    output_file_name = "urls.txt"
+    urls_file_name = "urls.txt"
     results_file_name = "Complete_TFreq.txt"
 
+    print(f'Parsing {starter_url}')
     relevant_urls = get_relevant_urls(starter_url, max_number_of_urls=15)
 
-    save_to_file(relevant_urls, output_file_name)
+    save_to_file(relevant_urls, urls_file_name)
+    print(f'Scraping {len(relevant_urls)} sites and creating text files')
     url_text_files = scrape_list_of_urls(relevant_urls)
+    print(f'Cleaning text files')
     clean_url_text_files = create_clean_files(url_text_files)  # stores a list of filenames
 
+    print(f'Combining text')
     combined_text = combine_text_from_files(clean_url_text_files)
 
     # End of FOR loop
-
+    print(f'Filtering text')
     important_tokens = filter_text(combined_text)
-    important_lemmas = lemmatize_tokens(important_tokens)
+    print(f'Lemmatizing text')
+    important_lemmas = lemmatize_tokens(important_tokens, min_length=0)
 
+    print('Calculating term frequencies')
     print_term_frequency(important_lemmas, number_of_terms=30)
 
 
@@ -157,7 +163,7 @@ def filter_text(text):
 ############ End of filter_text ########################
 
 
-def lemmatize_tokens(tokens):
+def lemmatize_tokens(tokens, min_length):
     WNL = WordNetLemmatizer()
 
     lemmas = [WNL.lemmatize(token) for token in tokens]
@@ -177,8 +183,8 @@ def lemmatize_tokens(tokens):
         elif tagged_lemma[1].startswith('V'):
             important_lemmas.append(tagged_lemma[0])
 
-    # Removing words shorter than 3 letters
-    important_lemmas = [lemma for lemma in important_lemmas if len(lemma) >= 4]
+    # Removing words shorter than min_length letters
+    important_lemmas = [lemma for lemma in important_lemmas if len(lemma) >= min_length]
 
     return important_lemmas
 
@@ -205,7 +211,7 @@ def print_term_frequency(tokens, number_of_terms):
 
     tf_dict = dict(tf_dict)  # Turns back to a dictionary
 
-    print(f"\n\nHere are the top {number_of_terms} terms from every file:")
+    print(f"\n\nHere are the top {number_of_terms} terms from the corpus:")
     # printing out the tf
     count = 1
     for token in tf_dict.keys():
