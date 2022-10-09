@@ -151,9 +151,6 @@ def filter_text(text):
     # get rid of punctuation and stopwords
     filtered_text = [t for t in tokens if t.isalpha() and t not in stopwords.words('english')]
 
-    # Removing words shorter than 3 letters
-    filtered_text = [t for t in filtered_text if len(t) >= 4]
-
     return filtered_text
 
 
@@ -179,6 +176,9 @@ def lemmatize_tokens(tokens):
         # Picking out the Verbs
         elif tagged_lemma[1].startswith('V'):
             important_lemmas.append(tagged_lemma[0])
+
+    # Removing words shorter than 3 letters
+    important_lemmas = [lemma for lemma in important_lemmas if len(lemma) >= 4]
 
     return important_lemmas
 
