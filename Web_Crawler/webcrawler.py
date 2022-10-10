@@ -38,6 +38,11 @@ def main():
     print('Calculating term frequencies')
     print_term_frequency(important_lemmas, number_of_terms=30)
 
+    MANUALLY_PICKED_IMPORTANT_WORDS = ["lamborghini", "sport", "engine", "vehicle", "volkswagen", "manufacturer", "business", "subsidiary", "Ducati", "model"]
+
+    knowledge_base = create_related_sentences_dict(MANUALLY_PICKED_IMPORTANT_WORDS, combined_text)
+    print("subsidiary:", knowledge_base["subsidiary"])
+
 
 def get_relevant_urls(start_url, max_number_of_urls):
     response = requests.get(start_url)
@@ -123,8 +128,11 @@ def clean_text_from_file(file_name):
 
     raw_text.replace('\n', ' ')
     raw_text.replace('\t', ' ')
+    raw_text.replace(' .', '.')
+    raw_text.replace(' ,', ',')
 
     sentences = nltk.sent_tokenize(raw_text)
+    save_to_file(sentences, 'test.txt')
     return sentences
 
 
@@ -160,9 +168,6 @@ def filter_text(text):
     return filtered_text
 
 
-############ End of filter_text ########################
-
-
 def lemmatize_tokens(tokens, min_length):
     WNL = WordNetLemmatizer()
 
@@ -187,9 +192,6 @@ def lemmatize_tokens(tokens, min_length):
     important_lemmas = [lemma for lemma in important_lemmas if len(lemma) >= min_length]
 
     return important_lemmas
-
-
-############ End of lemmatize_tokens ########################
 
 
 def print_term_frequency(tokens, number_of_terms):
@@ -221,7 +223,16 @@ def print_term_frequency(tokens, number_of_terms):
             break
 
 
-############ End of print_term_frequency ########################
+def create_related_sentences_dict(lemmas, text):
+    lines = text.split('\n')
+
+    related_sentences = {lemma: [] for lemma in lemmas}  # Dictionary of lemma: ["sent1", "sent2", ...]
+    for line in lines:
+        for lemma in lemmas:
+            if lemma in lemmatize_tokens(nltk.word_tokenize(line), min_length=0):
+                related_sentences[lemma].append(line.strip())
+
+    return related_sentences
 
 
 main()
