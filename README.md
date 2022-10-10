@@ -22,8 +22,8 @@ file is of a certain language, then writing those guesses to a file and comparin
 the accuracy of the prediction. With a simple guess by unigram, the accuracy is 100% on this test file, and very close to 
 that with a simple bigram probability guess. With a bigram guess with laplace smoothing, the accuracy is a bit lower at
 around 96%.
-#### Web Crawler [webcrawler.py](Web_Crawler/webcrawler.py)
-In this project, my partner Silvano Gallegos and I created a script which, given a link to a website (we chose the wikipedia link of Lamborghini),
+#### Web Crawler: [Report](Web_Crawler/Web_Crawler_Report.pdf), [webcrawler.py](Web_Crawler/webcrawler.py)
+In this project, my partner Silvano Gallegos and I created a script which, given a link to a website (we chose the Wikipedia link of Lamborghini),
 scrapes that website to find related links. It then filters those links by HTML tag data and link content to avoid links 
 with no information, such as a link leading to an image of the Wikipedia logo. After procuring those relevant URLs, the script
 then scrapes a number of those sites for text, which it stores to files. Each of those texts is cleaned through a filter
@@ -33,3 +33,5 @@ the top 30 important terms using term frequency. We then manually chose 10 words
 top terms were simply a result of Wikipedia formatting, such as the word "article". The script, using those 10 words, creates 
 a dictionary corresponding a word to every sentence that contains it, and stores those in a file for each of the 10 words,
 where every line is a sentence containing that word. In the future, this will be used as a knowledge base.
+
+The report also contains an overview of the code as well as some sample dialogues for the chatbot.

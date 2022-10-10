@@ -33,7 +33,6 @@ def main():
     print(f'Combining text')
     combined_text_as_lines = combine_lines_from_files(clean_url_text_files)
 
-    # End of FOR loop
     print(f'Filtering text')
     important_tokens = filter_text(combined_text_as_lines)
     print(f'Lemmatizing text')
@@ -42,7 +41,7 @@ def main():
     print('Calculating term frequencies')
     print_term_frequency(important_lemmas, number_of_terms=30)
 
-    MANUALLY_PICKED_IMPORTANT_WORDS = ["lamborghini", "sport", "engine", "vehicle", "volkswagen", "manufacturer",
+    MANUALLY_PICKED_IMPORTANT_WORDS = ["Lamborghini", "sport", "engine", "vehicle", "Volkswagen", "manufacturer",
                                        "business", "subsidiary", "Ducati", "model"]
 
     print(f'Creating knowledge base from {len(MANUALLY_PICKED_IMPORTANT_WORDS)} important words')
@@ -61,7 +60,11 @@ def get_relevant_urls(start_url, max_number_of_urls):
     relevant_urls = []
     for anchor_element in soup.find_all('a'):  # <a href="https://google.com">aaa</a> is an anchor element in HTML
         if is_relevant(anchor_element) and anchor_element.get('href') not in relevant_urls:  # Don't add duplicates
-            relevant_urls.append(anchor_element.get('href'))
+            link = anchor_element.get('href')
+            if link.startswith('/wiki/'):  # Account for Wikipedia links being in the form /wiki/...
+                link = "https://en.wikipedia.org" + link
+
+            relevant_urls.append(link)
 
         if len(relevant_urls) >= max_number_of_urls:
             break
@@ -112,9 +115,6 @@ def scrape_list_of_urls(url_list, directory):
     if not os.path.exists(directory):
         os.makedirs(directory)  # Create the directory in case it doesn't exist
     for url in url_list:
-        if url.startswith('/wiki'):
-            url = "https://en.wikipedia.org" + url
-
         text_lines = scrape(url)
         file_name = f"{directory}/Text - " + url.split('/')[-1]  # Get the last term of the link (rudimentary approach)
         save_line_list_to_file(text_lines, file_name)
@@ -136,7 +136,6 @@ def clean_text_from_file(file_name):
     with open(file_name, 'r', encoding='utf-8') as f:
         raw_text = f.read()  # List of lines
 
-    # raw_text = raw_text.replace('\n', ' ')
     raw_text = raw_text.replace('\t', ' ')
     raw_text = raw_text.replace(' .', '.')
     raw_text = raw_text.replace(' ,', ',')
@@ -189,13 +188,12 @@ def lemmatize_tokens(tokens, min_length):
 
     important_lemmas = []
 
-    # Separating the Nouns from the rest
     for tagged_lemma in tagged_lemmas:
-        # Picking out the Nouns
+        # Picking out the nouns
         if tagged_lemma[1].startswith('N'):
             important_lemmas.append(tagged_lemma[0])
 
-        # Picking out the Verbs
+        # Picking out the verbs
         elif tagged_lemma[1].startswith('V'):
             important_lemmas.append(tagged_lemma[0])
 
@@ -225,7 +223,7 @@ def print_term_frequency(tokens, number_of_terms):
     tf_dict = dict(tf_dict)  # Turns back to a dictionary
 
     print(f"\n\nHere are the top {number_of_terms} terms from the corpus:")
-    # printing out the tf
+    # Printing out the tf
     count = 1
     for token in tf_dict.keys():
         print(token, '->', tf_dict[token])
