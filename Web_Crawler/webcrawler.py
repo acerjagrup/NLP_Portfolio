@@ -233,6 +233,8 @@ def print_term_frequency(tokens, number_of_terms):
         if count > number_of_terms:
             break
 
+    print('\n')
+
 
 def create_related_sentences_dict(lemmas, sentences):
     related_sentences = {lemma: [] for lemma in lemmas}  # Dictionary of lemma: ["sent1", "sent2", ...]
