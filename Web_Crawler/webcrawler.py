@@ -4,8 +4,11 @@
 #   Date: October 7, 2022
 #
 
-from bs4 import BeautifulSoup
 import requests
+import os
+
+from bs4 import BeautifulSoup
+
 import nltk
 from nltk.corpus import stopwords
 from nltk import word_tokenize
@@ -15,33 +18,38 @@ from nltk.stem import WordNetLemmatizer
 def main():
     starter_url = "https://en.wikipedia.org/wiki/Lamborghini"
     urls_file_name = "urls.txt"
-    results_file_name = "Complete_TFreq.txt"
+    scraped_files_directory = "texts"
+    knowledge_base_directory = "kb"
 
     print(f'Parsing {starter_url}')
     relevant_urls = get_relevant_urls(starter_url, max_number_of_urls=15)
 
-    save_to_file(relevant_urls, urls_file_name)
-    print(f'Scraping {len(relevant_urls)} sites and creating text files')
-    url_text_files = scrape_list_of_urls(relevant_urls)
-    print(f'Cleaning text files')
+    save_line_list_to_file(relevant_urls, urls_file_name)
+    print(f'Scraping {len(relevant_urls)} sites and creating text files in /{scraped_files_directory}')
+    url_text_files = scrape_list_of_urls(relevant_urls, directory=scraped_files_directory)
+    print(f'Cleaning text files and saving to /{scraped_files_directory}')
     clean_url_text_files = create_clean_files(url_text_files)  # stores a list of filenames
 
     print(f'Combining text')
-    combined_text = combine_text_from_files(clean_url_text_files)
+    combined_text_as_lines = combine_lines_from_files(clean_url_text_files)
 
     # End of FOR loop
     print(f'Filtering text')
-    important_tokens = filter_text(combined_text)
+    important_tokens = filter_text(combined_text_as_lines)
     print(f'Lemmatizing text')
     important_lemmas = lemmatize_tokens(important_tokens, min_length=0)
 
     print('Calculating term frequencies')
     print_term_frequency(important_lemmas, number_of_terms=30)
 
-    MANUALLY_PICKED_IMPORTANT_WORDS = ["lamborghini", "sport", "engine", "vehicle", "volkswagen", "manufacturer", "business", "subsidiary", "Ducati", "model"]
+    MANUALLY_PICKED_IMPORTANT_WORDS = ["lamborghini", "sport", "engine", "vehicle", "volkswagen", "manufacturer",
+                                       "business", "subsidiary", "Ducati", "model"]
 
-    knowledge_base = create_related_sentences_dict(MANUALLY_PICKED_IMPORTANT_WORDS, combined_text)
-    print("subsidiary:", knowledge_base["subsidiary"])
+    print(f'Creating knowledge base from {len(MANUALLY_PICKED_IMPORTANT_WORDS)} important words')
+    knowledge_base = create_related_sentences_dict(MANUALLY_PICKED_IMPORTANT_WORDS, combined_text_as_lines)
+
+    print(f'Saving knowledge base')
+    save_knowledge_base(knowledge_base, directory=knowledge_base_directory)
 
 
 def get_relevant_urls(start_url, max_number_of_urls):
@@ -92,22 +100,24 @@ def is_relevant(anchor_element):
     return True
 
 
-def save_to_file(lines, file_name):
+def save_line_list_to_file(lines, file_name):
     with open(file_name, 'w', encoding='utf-8') as f:
         for line in lines:
             f.write(line + '\n')
 
 
-def scrape_list_of_urls(url_list):
+def scrape_list_of_urls(url_list, directory):
     file_names = []
 
+    if not os.path.exists(directory):
+        os.makedirs(directory)  # Create the directory in case it doesn't exist
     for url in url_list:
         if url.startswith('/wiki'):
             url = "https://en.wikipedia.org" + url
 
         text_lines = scrape(url)
-        file_name = "texts/Text - " + url.split('/')[-1]  # Get the last term of the link (rudimentary approach)
-        save_to_file(text_lines, file_name)
+        file_name = f"{directory}/Text - " + url.split('/')[-1]  # Get the last term of the link (rudimentary approach)
+        save_line_list_to_file(text_lines, file_name)
         file_names.append(file_name)
 
     return file_names
@@ -126,13 +136,13 @@ def clean_text_from_file(file_name):
     with open(file_name, 'r', encoding='utf-8') as f:
         raw_text = f.read()  # List of lines
 
-    raw_text.replace('\n', ' ')
-    raw_text.replace('\t', ' ')
-    raw_text.replace(' .', '.')
-    raw_text.replace(' ,', ',')
+    # raw_text = raw_text.replace('\n', ' ')
+    raw_text = raw_text.replace('\t', ' ')
+    raw_text = raw_text.replace(' .', '.')
+    raw_text = raw_text.replace(' ,', ',')
 
     sentences = nltk.sent_tokenize(raw_text)
-    save_to_file(sentences, 'test.txt')
+    sentences = [s.strip() for s in sentences]
     return sentences
 
 
@@ -140,29 +150,30 @@ def create_clean_files(list_of_files):
     file_names = []
     for file_name in list_of_files:
         sentences = clean_text_from_file(file_name)
-        save_to_file(sentences, file_name + ".clean")
-        file_names.append(file_name)
+        clean_file_name = file_name + ".clean"
+        save_line_list_to_file(sentences, clean_file_name)
+        file_names.append(clean_file_name)
 
     return file_names
 
 
-def combine_text_from_files(file_names):
-    combined_text = ""
+def combine_lines_from_files(file_names):
+    combined_lines = []
     for file_name in file_names:
         with open(file_name, 'r', encoding='utf-8') as file:
-            text = file.read()
-            combined_text = combined_text + text
+            lines = file.readlines()
+            combined_lines += lines
 
-    return combined_text
+    return combined_lines
 
 
-def filter_text(text):
-    # lower every letter
+def filter_text(lines):
+    text = '\n'.join(lines)
     text = text.lower()
 
     tokens = word_tokenize(text)
 
-    # get rid of punctuation and stopwords
+    # Get rid of punctuation, numbers, and stopwords
     filtered_text = [t for t in tokens if t.isalpha() and t not in stopwords.words('english')]
 
     return filtered_text
@@ -223,16 +234,21 @@ def print_term_frequency(tokens, number_of_terms):
             break
 
 
-def create_related_sentences_dict(lemmas, text):
-    lines = text.split('\n')
-
+def create_related_sentences_dict(lemmas, sentences):
     related_sentences = {lemma: [] for lemma in lemmas}  # Dictionary of lemma: ["sent1", "sent2", ...]
-    for line in lines:
+    for sentence in sentences:
         for lemma in lemmas:
-            if lemma in lemmatize_tokens(nltk.word_tokenize(line), min_length=0):
-                related_sentences[lemma].append(line.strip())
+            if lemma in lemmatize_tokens(nltk.word_tokenize(sentence), min_length=0):  # Must lemmatize sentences to check
+                related_sentences[lemma].append(sentence.strip())
 
     return related_sentences
+
+
+def save_knowledge_base(knowledge_base, directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)  # Create the directory in case it doesn't exist
+    for lemma, sentences in knowledge_base.items():
+        save_line_list_to_file(sentences, f"{directory}/{lemma}")
 
 
 main()
