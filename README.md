@@ -35,3 +35,7 @@ a dictionary corresponding a word to every sentence that contains it, and stores
 where every line is a sentence containing that word. In the future, this will be used as a knowledge base.
 
 The report also contains an overview of the code as well as some sample dialogues for the chatbot.
+#### Sentence Parsing: [Report](Sentence_Parsing/Sentence Parsing.pdf)
+This assignment involved writing a complex sentence and performing a phrase structure grammar (PSG) parse, dependency parse, and
+semantic role label (SRL) parse on that sentence. I chose the sentence, "Despite having already completed three years of high school, Jack found out that he had to complete two more due to his poor performance"
+and performed those parses by hand. Those are included in the report as well as my thoughts on the pros and cons of each parse.
