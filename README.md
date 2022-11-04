@@ -39,3 +39,7 @@ The report also contains an overview of the code as well as some sample dialogue
 This assignment involved writing a complex sentence and performing a phrase structure grammar (PSG) parse, dependency parse, and
 semantic role label (SRL) parse on that sentence. I chose the sentence, "Despite having already completed three years of high school, Jack found out that he had to complete two more due to his poor performance"
 and performed those parses by hand. Those are included in the report as well as my thoughts on the pros and cons of each parse.
+
+#### Author Attribution: [PDF of Notebook](Author_Attribution/Author_Attribution.pdf)
+In this project, I used several models to analyze the text of the Federalist papers to make guesses as to who authored each document.
+Some models used include Naïve Bayes, Logistic Regression, and an MLPRegressor neural network.
