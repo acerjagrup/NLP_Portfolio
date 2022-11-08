@@ -43,3 +43,9 @@ and performed those parses by hand. Those are included in the report as well as 
 #### Author Attribution: [PDF of Notebook](Author_Attribution/Author_Attribution.pdf)
 In this project, I used several models to analyze the text of the Federalist papers to make guesses as to who authored each document.
 Some models used include Naïve Bayes, Logistic Regression, and an MLPRegressor neural network.
+
+#### ACL Paper Analysis: [PDF of Summary](ACL/ACL_Paper_Analysis.pdf)
+This document is a summary of a paper I chose to read from the Association for Computational Linguistics, "Lower Perplexity is Not Always Human-Like"
+by Tatsuki Kuribayashi et al.
+I summarize the problem, prior work, unique contributions, self-evaluation, citations of the authors, and importance of the report in the summary document
+as a foray into reading academic papers.
