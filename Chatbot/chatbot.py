@@ -54,12 +54,15 @@ input_pattern = ">>>"
 def ask_for_clarification(some_input, message):
     print(f"{message} {some_input}.")
     answer = ask_question_get_response("Is that correct?")
+    if answer is None:
+        return None
     return answer.lower().startswith("y")
 
 
 def ask_question_get_response(question):
     print(question)
-    return input(input_pattern).strip()
+    answer = input(input_pattern).strip()
+    return answer if "exit" not in answer else None
 
 
 def get_intent(sentence):
@@ -93,12 +96,19 @@ def question_loop():
             intent = get_intent(request)
             if intent is None:
                 print("I'm sorry, I didn't understand that category.")
+                sleep(1)
             else:
                 message = prompts_by_intent[intent]["prompt"] + "\n" + "Some examples are: " + ", ".join(prompts_by_intent[intent]["examples"])
                 query = ask_question_get_response(message)
                 response = make_api_call(prompts_by_intent[intent]["api_representation"], query)
                 if response.ok:
-                    print('\n'.join(parse_api_response(json.loads(response.text))))
+                    json_response = json.loads(response.text)
+                    if len(json_response) >= 1:
+                        print("Here are some results I found:\n" if len(json_response) > 1 else "Here's a result I found:\n")
+                        sleep(1)
+                        print('\n'.join(parse_api_response(json_response)))
+                    else:
+                        print("Sorry, I couldn't find any results for that.")
                 else:
                     if response.status_code == 400:
                         print("Sorry, I couldn't find any results for that.")
@@ -111,11 +121,17 @@ def parse_api_response(list_of_cars):
 
 
 def car_to_string(car):
-    return f'{car["make"].upper()} {car["model"].upper()} {car["year"]}\n' \
-         + f'Class: {car["class"]}\n' \
-         + f'MPG: {car["city_mpg"]} city, {car["highway_mpg"]} highway\n' \
-         + f'Transmission: {"automatic" if car["transmission"] == "a" else "manual"}\n' \
-         + f'Drive: {car["drive"]}\n'
+    return_string = f'{car["make"].upper()} {car["model"].upper()} {car["year"]}\n'
+    if "class" in car.keys():
+        return_string += f'Class: {car["class"]}\n'
+    if "city_mpg" in car.keys() and "highway_mpg" in car.keys():
+        return_string += f'MPG: {car["city_mpg"]} city, {car["highway_mpg"]} highway\n'
+    if "transmission" in car.keys():
+        return_string += f'Transmission: {"automatic" if car["transmission"] == "a" else "manual"}\n'
+    if "drive" in car.keys():
+        return_string += f'Drive: {car["drive"]}\n'
+
+    return return_string
 
 
 def chat():
@@ -127,40 +143,59 @@ def chat():
 
     print(introduction_statement)
     name = ask_question_get_response("What's your name?")
+    if name is None:  # User exited
+        return
+
     is_correct = ask_for_clarification(name, "I have understood that your name is")
     while not is_correct:
         name = ask_question_get_response("What is your name, then?")
+        if name is None:  # User exited
+            return
         is_correct = ask_for_clarification(name, "I have understood that your name is")
+        if is_correct is None:  # User exited
+            return
     sleep(1)
 
     print("Tell me something about yourself.")
     nationality_statement = ask_question_get_response("Where are you from?")
+    if nationality_statement is None:
+        return
     sleep(1)
 
     print("That's cool. I'm from Dallas, Texas.")
     sleep(1)
 
     like_statement = ask_question_get_response("What do you like?")
+    if like_statement is None:
+        return
 
     dislike_statement = ask_question_get_response("What is something you dislike?")
+    if dislike_statement is None:
+        return
+    sleep(1)
+    print("Interesting...")
+    sleep(1)
 
     print("Personally, the only thing I care about is cars...")
     response = ask_question_get_response("Would you like to talk about them?")
     sleep(1)
+
+    if response is None:
+        return
 
     if response.startswith('n'):
         print("Aw, shucks! That is too bad for you. I don't think we can be friends.")
         return
 
     print("You sound very enthusiastic!")
-    sleep(1)
+    sleep(1.5)
 
     new_user['personal_info'] = nationality_statement
     new_user['likes'] = like_statement
     new_user['dislikes'] = dislike_statement
 
     print("I know a lot about many makes and models of cars and can help you \nfind cars based on some parameter you're looking for.")
-    sleep(2)
+    sleep(4)
     question_loop()
 
     users[name] = new_user
@@ -177,8 +212,8 @@ def retrieve_data(file_name):
 
 
 def main():
-
     chat()
-
     print(random.choice(goodbyes))
+
+
 main()
