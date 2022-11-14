@@ -262,6 +262,7 @@ def retrieve_data(file_name):
 def main():
     chat()
     print(random.choice(goodbyes))
-
+    print("If you have the time, please fill out this online survey so that I can improve my performance.")
+    print("https://utdallas.qualtrics.com/jfe/form/SV_5dUMCql3sDOVJ6m")
 
 main()
