@@ -86,7 +86,7 @@ def question_loop():
     while True:
         request = ask_question_get_response("\nWhat feature of cars would you like to search for?\nIf you're not sure of the categories, just say \"categories\".")
 
-        if "exit" in request.lower():
+        if request is None:
             break
 
         if request.lower() == "categories":
@@ -106,9 +106,10 @@ def question_loop():
                     if len(json_response) >= 1:
                         print("Here are some results I found:\n" if len(json_response) > 1 else "Here's a result I found:\n")
                         sleep(1)
-                        print('\n'.join(parse_api_response(json_response)))
+                        print(cars_to_string(json_response))
                     else:
                         print("Sorry, I couldn't find any results for that.")
+                        sleep(1)
                 else:
                     if response.status_code == 400:
                         print("Sorry, I couldn't find any results for that.")
@@ -116,8 +117,8 @@ def question_loop():
                         print("Sorry, I ran into an issue looking that data up.")
 
 
-def parse_api_response(list_of_cars):
-    return [car_to_string(car) for car in list_of_cars]
+def cars_to_string(list_of_cars):
+    return '\n'.join([car_to_string(car) for car in list_of_cars])
 
 
 def car_to_string(car):
@@ -129,7 +130,7 @@ def car_to_string(car):
     if "transmission" in car.keys():
         return_string += f'Transmission: {"automatic" if car["transmission"] == "a" else "manual"}\n'
     if "drive" in car.keys():
-        return_string += f'Drive: {car["drive"]}\n'
+        return_string += f'Drive: {car["drive"].upper()}\n'
 
     return return_string
 
@@ -194,8 +195,9 @@ def chat():
     new_user['likes'] = like_statement
     new_user['dislikes'] = dislike_statement
 
-    print("I know a lot about many makes and models of cars and can help you \nfind cars based on some parameter you're looking for.")
+    print("I know a lot of cars and can help you find some \nbased on a number of parameters.")
     sleep(4)
+
     question_loop()
 
     users[name] = new_user
