@@ -15,6 +15,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
+nltk.download('all')
 
 greetings = ["Hello.", "Hello there!", "Nice to meet you!"]
 goodbyes = ["It was nice speaking with you.", "See you later.", "Bye bye!"]
