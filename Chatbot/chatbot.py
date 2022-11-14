@@ -1,10 +1,10 @@
 import json
 import pickle
 import random
+import requests
 from time import sleep
 
 import nltk
-import requests
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -146,7 +146,8 @@ def clean_string(user_string):
     tokens = [token.lower() for token in tokens]
 
     extended_stopwords = stopwords.words("english")
-    extended_stopwords.extend(['disapprove', 'approve', 'like', 'dislike', 'love', 'hate', 'enjoy'])  # Specific stopwords because these are used for like/dislike statements
+    # Specific stopwords because these are used for like/dislike statements
+    extended_stopwords.extend(['disapprove', 'approve', 'like', 'dislike', 'love', 'hate', 'enjoy', 'n\'t'])
     clean_tokens = [token for token in tokens if token not in extended_stopwords]
     lemmatized_tokens = [lemmatizer.lemmatize(token) for token in clean_tokens]
 
@@ -230,20 +231,20 @@ def chat():
 
     if response.lower().startswith('n'):
         print("Aw, shucks! That is too bad for you. I don't think we can be friends.")
-        return
 
-    print("You sound very enthusiastic!")
-    sleep(1.5)
+    else:
+        print("You sound very enthusiastic!")
+        sleep(1.5)
+
+        print("I know a lot of cars and can help you find some \nbased on a number of parameters.")
+        sleep(4)
+
+        question_loop()
 
     # Save the user's provided information
-    new_user['personal_info'] = nationality_statement
+    new_user['origin'] = nationality_statement
     new_user['likes'] = like_statements if 'likes' not in new_user.keys() else new_user['likes'].extend(like_statements)
     new_user['dislikes'] = dislike_statements if 'dislikes' not in new_user.keys() else new_user['dislikes'].extend(dislike_statements)
-
-    print("I know a lot of cars and can help you find some \nbased on a number of parameters.")
-    sleep(4)
-
-    question_loop()
 
     users[name] = new_user
     store_data(users, 'user_data.p')
