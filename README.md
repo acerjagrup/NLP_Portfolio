@@ -49,3 +49,9 @@ This document is a summary of a paper I chose to read from the Association for C
 by Tatsuki Kuribayashi et al.
 I summarize the problem, prior work, unique contributions, self-evaluation, citations of the authors, and importance of the report in the summary document
 as a foray into reading academic papers.
+
+#### Chatbot: [Report](Chatbot/Chatbot_Evaluation_and_Report.pdf), [chatbot.py](Chatbot/chatbot.py)
+In this project, my partner Silvano Gallegos and I created a rules-based chatbot based off of the API Ninjas' Cars API which
+provides lists of cars based on some filter parameters. The bot also has a conversation with the user before that during which it
+saves the user's name, place of origin, likes, and dislikes. We also wrote a report on the bot including a detailed description,
+flow diagrams, sample dialogues, our evaluation of the bot, appendices for both the API and the user data we collected.
