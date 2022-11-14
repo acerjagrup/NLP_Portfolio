@@ -5,6 +5,10 @@ from time import sleep
 
 import nltk
 import requests
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
 
 greetings = ["Hello.", "Hello there!", "Nice to meet you!"]
 goodbyes = ["It was nice speaking with you.", "See you later.", "Bye bye!"]
@@ -49,6 +53,7 @@ prompts_by_intent = {
 
 introduction_statement = "Hi, my name is Autobot. I can provide knowledge on a number of cars.\nPlease type \"exit\" at any time to exit the conversation."
 input_pattern = ">>>"
+lemmatizer = WordNetLemmatizer()
 
 
 def ask_for_clarification(some_input, message):
@@ -89,7 +94,7 @@ def question_loop():
         if request is None:
             break
 
-        if request.lower() == "categories":
+        if request.lower() == "categories" or request.lower() == "category":
             print("The categories I know about are:")
             [print('\t' + intent) for intent in prompts_by_intent.keys()]
         else:
@@ -135,6 +140,49 @@ def car_to_string(car):
     return return_string
 
 
+def clean_string(user_string):
+
+    tokens = word_tokenize(user_string)
+    tokens = [token.lower() for token in tokens]
+
+    extended_stopwords = stopwords.words("english")
+    extended_stopwords.extend(['disapprove', 'approve', 'like', 'dislike', 'love', 'hate', 'enjoy'])  # Specific stopwords because these are used for like/dislike statements
+    clean_tokens = [token for token in tokens if token not in extended_stopwords]
+    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in clean_tokens]
+
+    return " ".join(lemmatized_tokens)
+
+
+def get_like_statements():
+    like_statements = []
+    while True:
+        like_statement = ask_question_get_response("What's something you like?\nWhen you're done talking about things you like, just say \"done\".")
+        if like_statement is None:
+            break
+
+        if like_statement.lower() == "done":
+            break
+
+        like_statements.append(clean_string(like_statement))
+
+    return like_statements
+
+
+def get_dislike_statements():
+    dislike_statements = []
+    while True:
+        dislike_statement = ask_question_get_response("What's something you dislike?\nWhen you're done talking about things you don't like, just say \"done\". ")
+        if dislike_statement is None:
+            break
+
+        if dislike_statement.lower() == "done":
+            break
+
+        dislike_statements.append(clean_string(dislike_statement))
+
+    return dislike_statements
+
+
 def chat():
     try:
         users = retrieve_data('user_data.p')
@@ -166,13 +214,9 @@ def chat():
     print("That's cool. I'm from Dallas, Texas.")
     sleep(1)
 
-    like_statement = ask_question_get_response("What do you like?")
-    if like_statement is None:
-        return
+    like_statements = get_like_statements()
+    dislike_statements = get_dislike_statements()
 
-    dislike_statement = ask_question_get_response("What is something you dislike?")
-    if dislike_statement is None:
-        return
     sleep(1)
     print("Interesting...")
     sleep(1)
@@ -191,9 +235,10 @@ def chat():
     print("You sound very enthusiastic!")
     sleep(1.5)
 
+    # Save the user's provided information
     new_user['personal_info'] = nationality_statement
-    new_user['likes'] = like_statement
-    new_user['dislikes'] = dislike_statement
+    new_user['likes'] = like_statements if 'likes' not in new_user.keys() else new_user['likes'].extend(like_statements)
+    new_user['dislikes'] = dislike_statements if 'dislikes' not in new_user.keys() else new_user['dislikes'].extend(dislike_statements)
 
     print("I know a lot of cars and can help you find some \nbased on a number of parameters.")
     sleep(4)
