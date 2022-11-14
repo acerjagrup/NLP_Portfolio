@@ -47,7 +47,7 @@ prompts_by_intent = {
     }
 }
 
-introduction_statement = "Hi, my name is Lambot. I can provide any knowledge on Lamborghini.\nPlease type \"exit\" at any time to exit the conversation."
+introduction_statement = "Hi, my name is Autobot. I can provide knowledge on a number of cars.\nPlease type \"exit\" at any time to exit the conversation."
 input_pattern = ">>>"
 
 
@@ -184,7 +184,7 @@ def chat():
     if response is None:
         return
 
-    if response.startswith('n'):
+    if response.lower().startswith('n'):
         print("Aw, shucks! That is too bad for you. I don't think we can be friends.")
         return
 
