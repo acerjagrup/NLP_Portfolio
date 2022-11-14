@@ -1,3 +1,9 @@
+# Created by: Acer Jagrup ACJ190005 & Silvano Guadalupe Gallegos SGG180002
+#   Assignment: Chatbot
+#   Class: CS 4395.001
+#   Date: November 13, 2022
+#
+
 import json
 import pickle
 import random
