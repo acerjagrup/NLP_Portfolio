@@ -55,3 +55,9 @@ In this project, my partner Silvano Gallegos and I created a rules-based chatbot
 provides lists of cars based on some filter parameters. The bot also has a conversation with the user before that during which it
 saves the user's name, place of origin, likes, and dislikes. We also wrote a report on the bot including a detailed description,
 flow diagrams, sample dialogues, our evaluation of the bot, appendices for both the API and the user data we collected.
+
+#### Text Classification: [PDF of Notebook](Text_Classification/Text_Classification.pdf)
+This is the final project from this course, in which I attempt to do text classification on a dataset of my choosing.
+That includes vectorizing and embedding the content of the text in order to pass it to tensorflow ML models.
+Unfortunately, I ran into computer issues during the completion of this assignment as my PC crashed when running
+a model (and Colab ran out of RAM due to the size of the dataset). 
